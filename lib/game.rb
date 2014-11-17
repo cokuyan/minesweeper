@@ -13,6 +13,8 @@ class Minesweeper
   end
 
   def run
+  begin
+    
     until @board.won?
       @board.display
 
@@ -31,6 +33,11 @@ class Minesweeper
         return
       end
     end
+
+  rescue NoMethodError
+    puts "Invalid Position"
+    retry
+  end
 
     puts "Congratulations! You won!"
     @board.display
