@@ -106,7 +106,7 @@ class Board
 
   def won?
     tiles.each do |tile|
-      return false if tile.bomb? && tile.revealed?
+      next if tile.bomb?
       return false unless tile.revealed?
     end
 

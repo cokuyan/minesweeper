@@ -14,15 +14,18 @@ class Minesweeper
   end
 
   def run
-
-    until @board.won?
-
+    turns = 0
     begin
 
       @board.display
+      puts "Time: #{(Time.now - @start_time).to_i}" unless turns.zero?
       puts "Bombs remaining: #{@flags}"
 
       move = gets.chomp.split
+
+      start_time = Time.now if turns.zero?
+      turns += 1
+
       type = move.shift
       move.map! { |pos| pos.to_i - 1 }.reverse!
 
@@ -45,12 +48,11 @@ class Minesweeper
     rescue NoMethodError
       puts "Invalid Position"
       retry
-    end
+    end until @board.won?
 
-    end
+    end_time = Time.now - start_time
 
-
-    puts "Congratulations! You won!"
+    puts "Congratulations! You won in #{end_time} seconds!"
     @board.display
   end
 
