@@ -10,6 +10,7 @@ class Minesweeper
 
   def initialize(board)
     @board = board
+    @flags = @board.bomb_count
   end
 
   def run
@@ -19,6 +20,7 @@ class Minesweeper
     begin
 
       @board.display
+      puts "Bombs remaining: #{@flags}"
 
       move = gets.chomp.split
       type = move.shift
@@ -30,6 +32,11 @@ class Minesweeper
         @board[move].reveal
       when "f"
         @board[move].flag
+        if @board[move].flagged?
+          @flags -= 1
+        else
+          @flags += 1
+        end
       when "save"
         save
         return

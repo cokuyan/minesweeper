@@ -15,15 +15,15 @@ class Board
                [-1,0],
                [-1,-1]
                ]
-  #
-  # BOMBS = 10
-  # DIMENSIONS = [9, 9]
+
   BOARDS = {
     b: [10, [9, 9]],
     i: [40, [16, 16]],
     e: [99, [16, 30]]
   }
 
+  attr_reader :bomb_count
+  
   def initialize(difficulty)
     @bomb_count, @dimensions = BOARDS[difficulty]
 
