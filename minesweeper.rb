@@ -62,9 +62,26 @@ class Board
   end
 
   def render
+    @board.map do |row|
+      row.map do |tile|
+        case
+        when tile.flagged?
+          "F"
+        when !tile.revealed?
+          "*"
+        when tile.bombed?
+          "X"
+        when tile.neighbor_bomb_count.zero?
+          "_"
+        else
+          neighbor_bomb_count.to_s
+        end
+      end.join
+    end
   end
 
   def display
+    puts render
   end
 
   def won?
