@@ -13,9 +13,16 @@ class Board
     Array.new(9) {Array.new(9)}
   end
 
-  def initialize(board = self.make_board, bombs = 9)
+  def initialize(board = nil, bombs = 9)
     @board = board
     @bombs = bombs
+
+    if @board.nil?
+      @board = self.make_board
+      create_tiles
+      assign_bombs
+      assign_neighbors
+    end
   end
 
   def create_tiles
@@ -44,6 +51,28 @@ class Board
         tile.neighbors = neighbors
       end
     end
+  end
+
+  def [](pos)
+    @board[pos.first][pos.last]
+  end
+
+  def []=(pos,value)
+    self[pos] = value
+  end
+
+  def render
+  end
+
+  def display
+  end
+
+  def won?
+    @board.flatten.each do |tile|
+      next if tile.bomb
+      return false unless tile.revealed?
+    end
+    true
   end
 
 end
@@ -93,6 +122,35 @@ class Tile
     @status == :flagged
   end
 
+end
 
+class Minesweeper
+
+  def initialize(board = Board.new)
+    @board = board
+  end
+
+  def run
+    until @board.won?
+      @board.display
+      move = gets.chomp.split
+      type = move.shift
+      case type
+      when "r"
+        @board[move].reveal
+        if @board[move].bombed?
+          return game_over
+        end
+      when "f"
+        @board[move].flag
+      end
+    end
+    @board.display
+  end
+
+  def game_over
+    puts "You lost :("
+    @board.display
+  end
 
 end
