@@ -27,8 +27,8 @@ class Board
   def assign_bombs
     @bombs.times do |i|
       tile = @board.sample.sample
-      redo if tile.status == :bomb
-      tile.status = :bomb
+      redo if tile.bomb
+      tile.bomb = true
     end
   end
 
@@ -39,20 +39,33 @@ class Board
         NEIGHBORS.each do |neighbor|
           new_neighbor = [i+neighbor.first,j+neighbor.last]
           next unless new_neighbor.all? {|pos| pos.between?(0,8)}
-          neighbors << new_neighbor
+          neighbors << @board[new_neighbor.first][new_neighbor.last]
         end
         tile.neighbors = neighbors
       end
     end
-
   end
 
 end
 
 class Tile
-  # def initialize(status)
-  #   @status = status
-  # end
+  def initialize()
+    @bomb = false
+    @status = :hidden
+  end
 
-  attr_accessor :status, :neighbors
+  attr_accessor :status, :neighbors, :bomb
+
+  def reveal
+    @status = :revealed
+    @bomb
+  end
+
+  def neighbor_bomb_count
+    neighbors.select {|neighbor| neighbor.bomb}.count
+  end
+
+  def flag
+
+  end
 end
