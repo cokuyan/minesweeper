@@ -23,7 +23,7 @@ class Board
   }
 
   attr_reader :bomb_count
-  
+
   def initialize(difficulty)
     @bomb_count, @dimensions = BOARDS[difficulty]
 
@@ -91,7 +91,7 @@ class Board
         when tile.bomb?
           "X"
         when tile.neighbor_bomb_count.zero?
-          "_"
+          " "
         else
           tile.neighbor_bomb_count.to_s
         end
