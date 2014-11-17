@@ -18,4 +18,4 @@ Cihangir "John" Okuyan
 
 email: chiryoku@gmail.com
 
-[App Academy][http://www.appacademy.io/#p-home]
+[App Academy]: http://www.appacademy.io/#p-home
