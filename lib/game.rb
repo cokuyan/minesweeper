@@ -8,7 +8,7 @@ class Minesweeper
     Minesweeper.new(YAML.load(file.read))
   end
 
-  def initialize(board = Board.new)
+  def initialize(board)
     @board = board
   end
 

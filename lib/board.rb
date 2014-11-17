@@ -15,23 +15,26 @@ class Board
                [-1,0],
                [-1,-1]
                ]
+  #
+  # BOMBS = 10
+  # DIMENSIONS = [9, 9]
+  BOARDS = {
+    b: [10, [9, 9]],
+    i: [40, [16, 16]],
+    e: [99, [16, 30]]
+  }
 
-  SIZE = 9
-  BOMBS = 9
+  def initialize(difficulty)
+    @bomb_count, @dimensions = BOARDS[difficulty]
 
-  def self.make_board
-    Array.new(SIZE) { Array.new(SIZE) }
+    @board = make_board
+    create_tiles
+    assign_bombs
+    assign_neighbors
   end
 
-  def initialize(board = nil, bomb_count = BOMBS)
-    @board, @bomb_count = board, bomb_count
-
-    if @board.nil?
-      @board = Board.make_board
-      create_tiles
-      assign_bombs
-      assign_neighbors
-    end
+  def make_board
+    Array.new(@dimensions.first) { Array.new(@dimensions.last) }
   end
 
   def create_tiles
@@ -56,7 +59,8 @@ class Board
 
         CALC_NEIGHBORS.each do |calc|
           neighbor_pos = [i + calc.first, j + calc.last]
-          next unless neighbor_pos.all? { |pos| pos.between?(0,SIZE - 1) }
+          next unless neighbor_pos.first.between?(0, @dimensions.first - 1) &&
+                      neighbor_pos.last.between?(0, @dimensions.last - 1)
           tile.neighbors << self[neighbor_pos]
         end
 
@@ -73,7 +77,9 @@ class Board
   end
 
   def render
-    @board.map do |row|
+    [((0..9).to_a * 4).drop(1).take(@dimensions.last).unshift("  ").join] +
+    @board.map.with_index do |row, i|
+      ((i + 1) % 10).to_s + " " +
       row.map do |tile|
         case
         when tile.status == :correct
@@ -89,8 +95,9 @@ class Board
         else
           tile.neighbor_bomb_count.to_s
         end
-      end.join
-    end
+      end.join + " " + ((i + 1) % 10).to_s
+    end +
+    [((0..9).to_a * 4).drop(1).take(@dimensions.last).unshift("  ").join]
   end
 
   def display
