@@ -26,15 +26,15 @@ class Minesweeper
 
       case type
       when "r"
-        @board[move].reveal
         return game_over if @board[move].bomb?
+        @board[move].reveal
       when "f"
         @board[move].flag
       when "save"
         save
         return
       end
-      
+
     rescue NoMethodError
       puts "Invalid Position"
       retry
