@@ -57,8 +57,28 @@ class Tile
   attr_accessor :status, :neighbors, :bomb
 
   def reveal
+    return if flagged?
+
+
+    if @bomb
+      @status = :bombed
+      return
+    end
+
     @status = :revealed
-    @bomb
+
+    neighbors.each do |neighbor|
+      neighbor.reveal if neighbor_bomb_count.zero?
+    end
+
+  end
+
+  def bombed?
+    @status == :bombed
+  end
+
+  def revealed?
+    @status == :revealed
   end
 
   def neighbor_bomb_count
@@ -66,6 +86,13 @@ class Tile
   end
 
   def flag
-
+    @status = :flagged
   end
+
+  def flagged?
+    @status == :flagged
+  end
+
+
+
 end
