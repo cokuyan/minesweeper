@@ -24,7 +24,7 @@ class Minesweeper
 
       move = gets.chomp.split
       type = move.shift
-      move.map! { |pos| pos.to_i - 1 }
+      move.map! { |pos| pos.to_i - 1 }.reverse!
 
       case type
       when "r"
