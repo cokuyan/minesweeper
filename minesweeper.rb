@@ -1,3 +1,5 @@
+require 'yaml'
+
 class Board
 
   def inspect
@@ -162,6 +164,11 @@ end
 
 class Minesweeper
 
+  def self.load
+    file = File.open("./save_file")
+    Minesweeper.new(YAML.load(file.read))
+  end
+
   def initialize(board = Board.new)
     @board = board
   end
@@ -180,8 +187,13 @@ class Minesweeper
         end
       when "f"
         @board[move].flag
+      when "save"
+        save
+        return
       end
     end
+
+    puts "Congratulations! You won!"
     @board.display
   end
 
@@ -191,4 +203,21 @@ class Minesweeper
     @board.display
   end
 
+  def save
+    File.open("save_file", "w") do |file|
+      file.puts @board.to_yaml
+    end
+  end
+
+end
+
+if __FILE__ == $PROGRAM_NAME
+  puts "Load game? (y/n)"
+  option = gets.chomp
+  if option == "y"
+    game = Minesweeper.load
+  else
+    game = Minesweeper.new
+  end
+  game.run
 end
