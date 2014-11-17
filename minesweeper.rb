@@ -13,15 +13,19 @@ class Board
                [1,-1],
                [-1,1],
                [-1,0],
-               [-1,-1]]
+               [-1,-1]
+               ]
+
+  SIZE = 9
+  BOMBS = 9
 
   def self.make_board
-    Array.new(9) {Array.new(9)}
+    Array.new(SIZE) { Array.new(SIZE) }
   end
 
-  def initialize(board = nil, bombs = 9)
+  def initialize(board = nil, bomb_count = BOMBS)
     @board = board
-    @bombs = bombs
+    @bomb_count = bomb_count
 
     if @board.nil?
       @board = Board.make_board
@@ -39,19 +43,19 @@ class Board
 
   def assign_bombs
     @bombs.times do |i|
-      tile = @board.sample.sample
+      tile = @board.flatten.sample
       redo if tile.bomb?
       tile.bomb = true
     end
   end
 
   def assign_neighbors
-    @board.each_with_index do |row,i|
-      row.each_with_index do |tile,j|
+    @board.each_with_index do |row, i|
+      row.each_with_index do |tile, j|
         neighbors = []
         NEIGHBORS.each do |neighbor|
-          new_neighbor = [i+neighbor.first, j+neighbor.last]
-          next unless new_neighbor.all? { |pos| pos.between?(0,8) }
+          new_neighbor = [i + neighbor.first, j + neighbor.last]
+          next unless new_neighbor.all? { |pos| pos.between?(0,SIZE - 1) }
           neighbors << self[new_neighbor]
         end
 
@@ -95,9 +99,10 @@ class Board
 
   def won?
     @board.flatten.each do |tile|
-      next if tile.bomb?
+      return false if tile.bomb? && tile.revealed?
       return false unless tile.revealed?
     end
+
     true
   end
 
@@ -126,13 +131,7 @@ class Tile
   end
 
   def reveal
-    return if flagged?
-
-
-    if @bomb
-      @status = :bombed
-      return
-    end
+    return if flagged? || bomb?
 
     @status = :revealed
 
@@ -147,7 +146,7 @@ class Tile
   end
 
   def neighbor_bomb_count
-    neighbors.select { |neighbor| neighbor.bomb? }.count
+    neighbors.select(&:bomb?).count
   end
 
   def flag
