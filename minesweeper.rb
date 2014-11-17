@@ -41,9 +41,13 @@ class Board
     end
   end
 
+  def tiles
+    @board.flatten
+  end
+
   def assign_bombs
     @bomb_count.times do |i|
-      tile = @board.flatten.sample
+      tile = tiles.sample
       redo if tile.bomb?
       tile.bomb = true
     end
@@ -98,7 +102,7 @@ class Board
   end
 
   def won?
-    @board.flatten.each do |tile|
+    tiles.each do |tile|
       return false if tile.bomb? && tile.revealed?
       return false unless tile.revealed?
     end
@@ -107,11 +111,9 @@ class Board
   end
 
   def reveal_bombs
-    @board.each do |row|
-      row.each do |tile|
-        next unless tile.bomb?
-        tile.status = tile.flagged? ? :correct : :revealed
-      end
+    tiles.each do |tile|
+      next unless tile.bomb?
+      tile.status = (tile.flagged? ? :correct : :revealed)
     end
   end
 
