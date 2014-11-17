@@ -33,14 +33,14 @@ class Board
 
   def create_tiles
     @board.each do |row|
-      row.map! {|tile| Tile.new}
+      row.map! { |tile| Tile.new }
     end
   end
 
   def assign_bombs
     @bombs.times do |i|
       tile = @board.sample.sample
-      redo if tile.bomb
+      redo if tile.bomb?
       tile.bomb = true
     end
   end
@@ -50,10 +50,11 @@ class Board
       row.each_with_index do |tile,j|
         neighbors = []
         NEIGHBORS.each do |neighbor|
-          new_neighbor = [i+neighbor.first,j+neighbor.last]
-          next unless new_neighbor.all? {|pos| pos.between?(0,8)}
-          neighbors << @board[new_neighbor.first][new_neighbor.last]
+          new_neighbor = [i+neighbor.first, j+neighbor.last]
+          next unless new_neighbor.all? { |pos| pos.between?(0,8) }
+          neighbors << self[new_neighbor]
         end
+
         tile.neighbors = neighbors
       end
     end
@@ -77,7 +78,7 @@ class Board
           "F"
         when !tile.revealed?
           "*"
-        when tile.bomb
+        when tile.bomb?
           "X"
         when tile.neighbor_bomb_count.zero?
           "_"
@@ -94,7 +95,7 @@ class Board
 
   def won?
     @board.flatten.each do |tile|
-      next if tile.bomb
+      next if tile.bomb?
       return false unless tile.revealed?
     end
     true
@@ -103,7 +104,7 @@ class Board
   def reveal_bombs
     @board.each do |row|
       row.each do |tile|
-        next unless tile.bomb
+        next unless tile.bomb?
         tile.status = tile.flagged? ? :correct : :revealed
       end
     end
@@ -117,7 +118,12 @@ class Tile
     @status = :hidden
   end
 
-  attr_accessor :status, :neighbors, :bomb
+  attr_accessor :status, :neighbors
+  attr_writer :bomb
+
+  def bomb?
+    @bomb
+  end
 
   def reveal
     return if flagged?
@@ -136,16 +142,12 @@ class Tile
 
   end
 
-  def bombed?
-    @status == :bombed
-  end
-
   def revealed?
     @status == :revealed
   end
 
   def neighbor_bomb_count
-    neighbors.select {|neighbor| neighbor.bomb}.count
+    neighbors.select { |neighbor| neighbor.bomb? }.count
   end
 
   def flag
@@ -182,7 +184,7 @@ class Minesweeper
       case type
       when "r"
         @board[move].reveal
-        if @board[move].bombed?
+        if @board[move].bomb?
           return game_over
         end
       when "f"
