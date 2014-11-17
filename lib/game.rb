@@ -13,9 +13,11 @@ class Minesweeper
   end
 
   def run
-  begin
-    
+
     until @board.won?
+
+    begin
+
       @board.display
 
       move = gets.chomp.split
@@ -32,12 +34,14 @@ class Minesweeper
         save
         return
       end
+      
+    rescue NoMethodError
+      puts "Invalid Position"
+      retry
     end
 
-  rescue NoMethodError
-    puts "Invalid Position"
-    retry
-  end
+    end
+
 
     puts "Congratulations! You won!"
     @board.display
