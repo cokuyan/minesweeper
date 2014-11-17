@@ -42,7 +42,7 @@ class Board
   end
 
   def assign_bombs
-    @bombs.times do |i|
+    @bomb_count.times do |i|
       tile = @board.flatten.sample
       redo if tile.bomb?
       tile.bomb = true
