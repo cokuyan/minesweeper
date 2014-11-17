@@ -1,4 +1,8 @@
 class Board
+
+  def inspect
+  end
+
   NEIGHBORS = [
                [0,1],
                [1,0],
@@ -18,7 +22,7 @@ class Board
     @bombs = bombs
 
     if @board.nil?
-      @board = self.make_board
+      @board = Board.make_board
       create_tiles
       assign_bombs
       assign_neighbors
@@ -65,16 +69,18 @@ class Board
     @board.map do |row|
       row.map do |tile|
         case
+        when tile.status == :correct
+          "O"
         when tile.flagged?
           "F"
         when !tile.revealed?
           "*"
-        when tile.bombed?
+        when tile.bomb
           "X"
         when tile.neighbor_bomb_count.zero?
           "_"
         else
-          neighbor_bomb_count.to_s
+          tile.neighbor_bomb_count.to_s
         end
       end.join
     end
@@ -90,6 +96,15 @@ class Board
       return false unless tile.revealed?
     end
     true
+  end
+
+  def reveal_bombs
+    @board.each do |row|
+      row.each do |tile|
+        next unless tile.bomb
+        tile.status = tile.flagged? ? :correct : :revealed
+      end
+    end
   end
 
 end
@@ -114,7 +129,7 @@ class Tile
     @status = :revealed
 
     neighbors.each do |neighbor|
-      neighbor.reveal if neighbor_bomb_count.zero?
+      neighbor.reveal if neighbor_bomb_count.zero? && !neighbor.revealed?
     end
 
   end
@@ -132,7 +147,11 @@ class Tile
   end
 
   def flag
-    @status = :flagged
+    if @status == :flagged
+      @status = :hidden
+    else
+      @status = :flagged unless revealed?
+    end
   end
 
   def flagged?
@@ -152,6 +171,7 @@ class Minesweeper
       @board.display
       move = gets.chomp.split
       type = move.shift
+      move.map!(&:to_i)
       case type
       when "r"
         @board[move].reveal
@@ -167,6 +187,7 @@ class Minesweeper
 
   def game_over
     puts "You lost :("
+    @board.reveal_bombs
     @board.display
   end
 
